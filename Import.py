@@ -131,70 +131,81 @@ def find_max_shape(data):
     extend_shape = (np.ceil(max_shape/1000)*1000).astype(np.int32)
     return extend_shape
 
-
+def define_border(border_val, data_set, image_shape, i):
+    vert_border = (image_shape[0] - data_set[i].shape[0]) / 2
+    horz_border = (image_shape[1] - data_set[i].shape[1]) / 2
+    if vert_border % 2 == 0:
+        border_val[0] = vert_border
+        border_val[3] = vert_border
+    else:
+        border_val[0] = np.ceil(vert_border)
+        border_val[3] = np.floor(vert_border)
+    if horz_border % 2 == 0:
+        border_val[1] = horz_border
+        border_val[2] = horz_border
+    else:
+        border_val[1] = np.ceil(horz_border)
+        border_val[2] = np.floor(horz_border)
+    border_val = border_val.astype(np.int32)
+    return border_val
 
 def add_border(data, image_shape):
     "Adds border to image using cv2.copyMakeBorder, and the consistent image dimensions specified by image_shape"
     bordered_data = data
+    border_val = np.empty(4) #top, left, right, bottom
     border_colour = [0, 0, 0]
     for i in np.arange(0, len(data.test_normal)):
-        vert_border = np.round((image_shape[0] - data.test_normal[i].shape[0]) / 2).astype(np.int32)
-        horz_border = np.round((image_shape[1] - data.test_normal[i].shape[1]) / 2).astype(np.int32)
+        border_val = define_border(border_val, data.test_normal, image_shape, i)
         bordered_data.test_normal[i] = cv2.copyMakeBorder(data.test_normal[i],
-                                       top =  vert_border,
-                                       left = horz_border,
-                                       right = horz_border,
-                                       bottom = vert_border,
+                                       top =  border_val[0],
+                                       left = border_val[1],
+                                       right = border_val[2],
+                                       bottom = border_val[3],
                                        borderType = cv2.BORDER_CONSTANT,
                                        value = border_colour)
     for i in np.arange(0, len(data.test_pneumonia)):
-        vert_border = np.round((image_shape[0] - data.test_pneumonia[i].shape[0]) / 2).astype(np.int32)
-        horz_border = np.round((image_shape[1] - data.test_pneumonia[i].shape[1]) / 2).astype(np.int32)
+        border_val = define_border(border_val, data.test_pneumonia, image_shape, i)
         bordered_data.test_pneumonia[i] = cv2.copyMakeBorder(data.test_pneumonia[i],
-                                       top =  vert_border,
-                                       left = horz_border,
-                                       right = horz_border,
-                                       bottom = vert_border,
+                                       top =  border_val[0],
+                                       left = border_val[1],
+                                       right = border_val[2],
+                                       bottom = border_val[3],
                                        borderType = cv2.BORDER_CONSTANT,
                                        value = border_colour)
     for i in np.arange(0, len(data.train_normal)):
-        vert_border = np.round((image_shape[0] - data.train_normal[i].shape[0]) / 2).astype(np.int32)
-        horz_border = np.round((image_shape[1] - data.train_normal[i].shape[1]) / 2).astype(np.int32)
+        border_val = define_border(border_val, data.train_normal, image_shape, i)
         bordered_data.train_normal[i] = cv2.copyMakeBorder(data.train_normal[i],
-                                       top =  vert_border,
-                                       left = horz_border,
-                                       right = horz_border,
-                                       bottom = vert_border,
+                                       top =  border_val[0],
+                                       left = border_val[1],
+                                       right = border_val[2],
+                                       bottom = border_val[3],
                                        borderType = cv2.BORDER_CONSTANT,
                                        value = border_colour)
     for i in np.arange(0, len(data.train_pneumonia)):
-        vert_border = np.round((image_shape[0] - data.train_pneumonia[i].shape[0]) / 2).astype(np.int32)
-        horz_border = np.round((image_shape[1] - data.train_pneumonia[i].shape[1]) / 2).astype(np.int32)
+        border_val = define_border(border_val, data.train_pneumonia, image_shape, i)
         bordered_data.train_pneumonia[i] = cv2.copyMakeBorder(data.train_pneumonia[i],
-                                       top =  vert_border,
-                                       left = horz_border,
-                                       right = horz_border,
-                                       bottom = vert_border,
+                                       top =  border_val[0],
+                                       left = border_val[1],
+                                       right = border_val[2],
+                                       bottom = border_val[3],
                                        borderType = cv2.BORDER_CONSTANT,
                                        value = border_colour)
     for i in np.arange(0, len(data.val_normal)):
-        vert_border = np.round((image_shape[0] - data.val_normal[i].shape[0]) / 2).astype(np.int32)
-        horz_border = np.round((image_shape[1] - data.val_normal[i].shape[1]) / 2).astype(np.int32)
+        border_val = define_border(border_val, data.val_normal, image_shape, i)
         bordered_data.val_normal[i] = cv2.copyMakeBorder(data.val_normal[i],
-                                       top =  vert_border,
-                                       left = horz_border,
-                                       right = horz_border,
-                                       bottom = vert_border,
+                                       top =  border_val[0],
+                                       left = border_val[1],
+                                       right = border_val[2],
+                                       bottom = border_val[3],
                                        borderType = cv2.BORDER_CONSTANT,
                                        value = border_colour)
     for i in np.arange(0, len(data.val_pneumonia)):
-        vert_border = np.round((image_shape[0] - data.val_pneumonia[i].shape[0]) / 2).astype(np.int32)
-        horz_border = np.round((image_shape[1] - data.val_pneumonia[i].shape[1]) / 2).astype(np.int32)
+        border_val = define_border(border_val, data.val_pneumonia, image_shape, i)
         bordered_data.val_pneumonia[i] = cv2.copyMakeBorder(data.val_pneumonia[i],
-                                       top =  vert_border,
-                                       left = horz_border,
-                                       right = horz_border,
-                                       bottom = vert_border,
+                                       top =  border_val[0],
+                                       left = border_val[1],
+                                       right = border_val[2],
+                                       bottom = border_val[3],
                                        borderType = cv2.BORDER_CONSTANT,
                                        value = border_colour)
     return bordered_data
