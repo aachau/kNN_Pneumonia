@@ -9,7 +9,7 @@ import glob #for pathname finding
 from sklearn.decomposition import PCA
 from sklearn.neighbors import NearestNeighbors
 from sklearn.cluster import KMeans
-
+from sklearn import metrics
 
 
 class files_class:
@@ -285,6 +285,12 @@ clust.fit(PCA_data)
 centroids = clust.cluster_centers_
 c=clust.labels_.astype(float)
 
+
+labels = np.empty([200])
+labels[0:100] = 1
+labels[101:200] = 0
+label_binary = np.array(('normal','viral'))
+
 plt.figure(figsize=(9,5))
 x=PCA_data[:,0]
 y=PCA_data[:,1]
@@ -294,9 +300,18 @@ plt.xlabel('Component 1')
 plt.ylabel('Component 2')
 plt.title('Pneumonia Classification Dataset KMeans Clustering')
 plt.scatter(centroids[:,0],centroids[:,1],marker='x')
-# for i in range (10):
-#     xy=(centroids[i, 0],centroids[i, 1])
-#     plt.annotate(labels[i],xy, horizontalalignment='right', verticalalignment='top')
+for i in range (centroids.shape[0]):
+    xy=(centroids[i, 0],centroids[i, 1])
+    plt.annotate(label_binary[i],xy, horizontalalignment='right', verticalalignment='top')
 plt.show()
+
+H=metrics.homogeneity_score(labels,clust.labels_.astype(float))  #Homogeneity. It compares your true output classes to how those outputs are arranged throughout the clusters. So clusters = 10, but only 3 true classes.
+C=metrics.completeness_score(labels,clust.labels_.astype(float))
+F=metrics.fowlkes_mallows_score(labels,clust.labels_.astype(float))
+
+print('Homogeneity =',H)
+print('Completeness =',C)
+print('FM Score =',F)
+# print('Inertia=',inertia)
 
 print('placeholder')
