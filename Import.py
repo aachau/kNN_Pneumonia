@@ -6,6 +6,10 @@ from scipy import signal, ndimage
 import sklearn as sklearn
 import cv2
 import glob #for pathname finding
+from sklearn.decomposition import PCA
+from sklearn.neighbors import NearestNeighbors
+from sklearn.cluster import KMeans
+
 
 
 class files_class:
@@ -209,6 +213,38 @@ def add_border(data, image_shape):
                                        borderType = cv2.BORDER_CONSTANT,
                                        value = border_colour)
     return bordered_data
+
+
+def vector2(data):
+    """from jupyter"""
+    data1 = data
+    new_data = data1
+    for i in np.arange(0, len(new_data.test_normal)):
+        rows, cols = data.test_normal[i].shape
+        new_data.test_normal[i] = data.test_normal[i].reshape(rows * cols)
+
+    for i in np.arange(0, len(new_data.test_pneumonia)):
+        rows, cols = data.test_pneumonia[i].shape
+        new_data.test_pneumonia[i] = data.test_pneumonia[i].reshape(rows * cols)
+
+    for i in np.arange(0, len(new_data.train_normal)):
+        rows, cols = data.train_normal[i].shape
+        new_data.train_normal[i] = data.train_normal[i].reshape(rows * cols)
+
+    for i in np.arange(0, len(new_data.train_pneumonia)):
+        rows, cols = data.train_pneumonia[i].shape
+        new_data.train_pneumonia[i] = data.train_pneumonia[i].reshape(rows * cols)
+
+    for i in np.arange(0, len(new_data.val_normal)):
+        rows, cols = data.val_normal[i].shape
+        new_data.val_normal[i] = data.val_normal[i].reshape(rows * cols)
+
+    for i in np.arange(0, len(new_data.val_pneumonia)):
+        rows, cols = data.val_pneumonia[i].shape
+        new_data.val_pneumonia[i] = data.val_pneumonia[i].reshape(rows * cols)
+
+    return (new_data)
+
 """======================================================================================================================"""
 
 
@@ -228,5 +264,39 @@ data = read_files(files=files_object, file_num=10, read_all=False) #use file_num
 vectorize_data = vectorize(data)
 image_shape = find_max_shape(vectorize_data)
 final_data = add_border(vectorize_data, image_shape)
+
+
+x_data=vector2(final_data)
+
+test_normal=np.asarray(x_data.test_normal, dtype=np.uint8)
+test_virus=np.asarray(x_data.test_pneumonia, dtype=np.uint8)
+
+train_normal=np.asarray(x_data.train_normal, dtype=np.uint8)
+train_virus=np.asarray(x_data.train_pneumonia, dtype=np.uint8)
+
+train_data=np.concatenate((train_normal, train_virus), axis=0)
+
+print('PCA BEGINNING...')
+PCA_data = PCA(n_components=2).fit_transform(train_data)
+print('PCA FINISHED')
+k=2
+clust=KMeans(n_clusters=k, n_init=10, tol=0.0001)
+clust.fit(PCA_data)
+centroids = clust.cluster_centers_
+c=clust.labels_.astype(float)
+
+plt.figure(figsize=(9,5))
+x=PCA_data[:,0]
+y=PCA_data[:,1]
+plt.scatter(x,y, c=clust.labels_, cmap=plt.cm.get_cmap('Spectral', 10))
+plt.colorbar()
+plt.xlabel('Component 1')
+plt.ylabel('Component 2')
+plt.title('Pneumonia Classification Dataset KMeans Clustering')
+plt.scatter(centroids[:,0],centroids[:,1],marker='x')
+# for i in range (10):
+#     xy=(centroids[i, 0],centroids[i, 1])
+#     plt.annotate(labels[i],xy, horizontalalignment='right', verticalalignment='top')
+plt.show()
 
 print('placeholder')
