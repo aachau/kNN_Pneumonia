@@ -211,8 +211,9 @@ data_regular_expression = '*.jpeg'
 indicate the object: data, and then put a: "." after to access the objects lists inside data.
 The lists are organized into the image classifications of: test_normal, test_pneumonia... etc.
 Index into an image of the list by: data.test_normal[i], and this will give the information for a simple 2D image."""
+
 files_object = find_files(data_directory, data_regular_expression) #use this value to change how many images you read of each category for rapid evaluation
-data = read_files(files=files_object, file_num=10, read_all=False)
+data = read_files(files=files_object, file_num=10, read_all=False) #use file_num to indicate the number of images in each class to load, or use "read_all = True" to read everything)
 vectorize_data = vectorize(data)
 image_shape = find_max_shape(vectorize_data)
 final_data = add_border(vectorize_data, image_shape)
