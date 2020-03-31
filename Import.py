@@ -312,6 +312,6 @@ F=metrics.fowlkes_mallows_score(labels,clust.labels_.astype(float))
 print('Homogeneity =',H)
 print('Completeness =',C)
 print('FM Score =',F)
-# print('Inertia=',inertia)
+print('Inertia=',inertia)
 
 print('placeholder')
