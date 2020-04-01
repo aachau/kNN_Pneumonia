@@ -1,0 +1,68 @@
+## Functions to find average shape of all images, and resize them 
+
+def find_average_shape(data):
+    ave_shape = np.empty(2)
+    for i in np.arange(0, len(data.test_normal)):
+        ave_shape[0]=ave_shape[0]+data.test_normal[i].shape[0]
+        ave_shape[1]=ave_shape[1]+data.test_normal[i].shape[1]
+    for i in np.arange(0, len(data.test_pneumonia)):
+        ave_shape[0]=ave_shape[0]+data.test_pneumonia[i].shape[0]
+        ave_shape[1]=ave_shape[1]+data.test_pneumonia[i].shape[1]
+    for i in np.arange(0, len(data.train_normal)):
+        ave_shape[0]=ave_shape[0]+data.train_normal[i].shape[0]
+        ave_shape[1]=ave_shape[1]+data.train_normal[i].shape[1]
+    for i in np.arange(0, len(data.train_pneumonia)):
+        ave_shape[0]=ave_shape[0]+data.train_pneumonia[i].shape[0]
+        ave_shape[1]=ave_shape[1]+data.train_pneumonia[i].shape[1]
+    for i in np.arange(0, len(data.val_normal)):
+        ave_shape[0]=ave_shape[0]+data.val_normal[i].shape[0]
+        ave_shape[1]=ave_shape[1]+data.val_normal[i].shape[1]
+    for i in np.arange(0, len(data.val_pneumonia)):
+        ave_shape[0]=ave_shape[0]+data.val_pneumonia[i].shape[0]
+        ave_shape[1]=ave_shape[1]+data.val_pneumonia[i].shape[1]
+
+    ave_shape = np.asarray(ave_shape)/(len(data.test_normal)*6)
+    ave_shape = ave_shape.astype(np.int32)
+    
+    return ave_shape
+
+
+def reshape_image(data,new_dim):
+    resized_data=data
+    width=new_dim[0]
+    height=new_dim[1]
+    dim=(width, height)
+
+    for i in np.arange(0, len(data.test_normal)):
+        resized_data.test_normal[i] = cv2.resize(data.test_normal[i], dim, interpolation = cv2.INTER_LINEAR)
+        
+    for i in np.arange(0, len(data.test_pneumonia)):
+        resized_data.test_pneumonia[i] = cv2.resize(data.test_pneumonia[i], dim, interpolation = cv2.INTER_LINEAR)
+       
+    for i in np.arange(0, len(data.train_normal)):
+        resized_data.train_normal[i] = cv2.resize(data.train_normal[i], dim, interpolation = cv2.INTER_LINEAR)
+       
+    for i in np.arange(0, len(data.train_pneumonia)):
+        resized_data.train_pneumonia[i] = cv2.resize(data.train_pneumonia[i], dim, interpolation = cv2.INTER_LINEAR)
+        
+    for i in np.arange(0, len(data.val_normal)):
+        resized_data.val_normal[i] = cv2.resize(data.val_normal[i], dim, interpolation = cv2.INTER_LINEAR)
+        
+    for i in np.arange(0, len(data.val_pneumonia)):
+        resized_data.val_pneumonia[i] = cv2.resize(data.val_pneumonia[i], dim, interpolation = cv2.INTER_LINEAR)
+
+    return resized_data
+    
+    
+ ## Resize Images 
+data_directory = os.path.join('.', 'chest_xray')
+data_directory_list = os.listdir(data_directory)
+data_regular_expression = '*.jpeg'
+
+files_object = find_files(data_directory, data_regular_expression) 
+data = read_files(files=files_object, file_num=50, read_all=False)
+
+vectorize_data = vectorize(data)
+ave_shape=find_average_shape(vectorize_data)
+#ave_shape=(2500,2500) ##--> can use this if we want to hard-code an image size
+final_data = reshape_image(vectorize_data, ave_shape)
